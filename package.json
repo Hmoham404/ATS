@@ -1,0 +1,14 @@
+{
+  "name": "ai-cv-checker",
+  "version": "1.0.0",
+  "description": "AI-powered CV analyzer with instant ATS score",
+  "private": true,
+  "scripts": {
+    "dev": "cd backend && npm run dev",
+    "start": "cd backend && npm start",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend"
+  },
+  "keywords": ["CV", "Resume", "ATS", "AI", "Analysis"],
+  "author": "Your Name",
+  "license": "MIT"
+}
