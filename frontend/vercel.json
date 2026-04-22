@@ -1,27 +1,37 @@
 {
-  "name": "AI CV Checker",
   "version": 2,
-  "public": false,
-  "buildCommand": "echo 'No build needed'",
+  "name": "AI CV Checker Frontend",
+  "buildCommand": "echo 'Static site - no build needed'",
   "outputDirectory": ".",
+  "public": false,
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/.*",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=3600, s-maxage=3600"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
         }
       ]
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/[^.]+$",
+      "dest": "/index.html"
     }
-  ],
-  "env": {
-    "REACT_APP_API_URL": "@api_url"
-  }
+  ]
 }

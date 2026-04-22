@@ -1,4 +1,15 @@
-const API_URL = 'http://localhost:5000/api';
+// Dynamic API URL configuration
+const API_URL = (() => {
+  // If in production (Vercel), use environment variable or default to production API
+  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return window.API_URL || 'https://ats-backend.onrender.com/api';
+  }
+  // Development: use localhost
+  return 'http://localhost:5000/api';
+})();
+
+console.log('🔗 API URL:', API_URL);
+
 let currentAnalysis = null;
 
 /* ==========================================

@@ -1,0 +1,12 @@
+{
+  "name": "ai-cv-checker-frontend",
+  "version": "1.0.0",
+  "description": "AI CV Checker - Frontend",
+  "scripts": {
+    "start": "http-server -p 3000",
+    "dev": "http-server"
+  },
+  "keywords": ["cv", "ats", "ai"],
+  "author": "Mohamed Lakhal",
+  "license": "MIT"
+}
