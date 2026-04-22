@@ -1,14 +1,13 @@
 {
   "name": "ai-cv-checker",
   "version": "1.0.0",
-  "description": "AI-powered CV analyzer with instant ATS score",
+  "description": "AI CV Checker - Get instant ATS scores and AI-powered suggestions",
   "private": true,
   "scripts": {
     "dev": "cd backend && npm run dev",
-    "start": "cd backend && npm start",
-    "install-all": "npm install && cd backend && npm install && cd ../frontend"
+    "start": "cd frontend && npx http-server -p 3000"
   },
   "keywords": ["CV", "Resume", "ATS", "AI", "Analysis"],
-  "author": "Your Name",
+  "author": "Mohamed Lakhal",
   "license": "MIT"
 }
