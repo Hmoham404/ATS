@@ -1,6 +1,23 @@
-const axios = require('axios');
+const https = require('https');
 
-const AI_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+function makeHttpsRequest(options, data) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(body));
+        } catch {
+          reject(new Error('Invalid JSON response'));
+        }
+      });
+    });
+    req.on('error', reject);
+    req.write(JSON.stringify(data));
+    req.end();
+  });
+}
 
 async function analyzeCV(cvText) {
   const AI_API_KEY = process.env.OPENROUTER_API_KEY;
@@ -33,7 +50,17 @@ Provide a detailed analysis in JSON format with the following structure:
 Return ONLY valid JSON, no additional text.`;
 
   try {
-    const response = await axios.post(AI_API_URL, {
+    const options = {
+      hostname: 'openrouter.ai',
+      path: '/api/v1/chat/completions',
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${AI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    const response = await makeHttpsRequest(options, {
       model: 'openai/gpt-3.5-turbo',
       messages: [
         {
@@ -43,14 +70,9 @@ Return ONLY valid JSON, no additional text.`;
       ],
       max_tokens: 2000,
       temperature: 0.7
-    }, {
-      headers: {
-        'Authorization': `Bearer ${AI_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
     });
 
-    const content = response.data.choices[0].message.content;
+    const content = response.choices[0].message.content;
     return JSON.parse(content);
   } catch (error) {
     console.error('AI API Error:', error.message);
