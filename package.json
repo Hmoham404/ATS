@@ -4,7 +4,7 @@
   "description": "AI CV Checker - Get instant ATS scores and AI-powered suggestions",
   "private": true,
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "cd backend && npm run dev",
