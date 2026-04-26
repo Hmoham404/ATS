@@ -1,7 +1,4 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
-
-import axios from 'axios';
+const axios = require('axios');
 
 const AI_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -89,7 +86,7 @@ function getMockAnalysis() {
   };
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -124,4 +121,4 @@ export default async function handler(req, res) {
       error: error.message || 'Failed to analyze CV'
     });
   }
-}
+};
