@@ -1,16 +1,25 @@
 {
   "version": 2,
-  "name": "ai-cv-checker",
-  "builds": [
-    {
-      "src": "frontend/**",
-      "use": "@vercel/static"
+  "buildCommand": "npm install --prefix backend && npm install --prefix frontend",
+  "outputDirectory": "frontend",
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "10000"
+  },
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 60
     }
-  ],
+  },
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "dest": "/index.html"
     }
   ]
 }

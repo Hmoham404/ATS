@@ -1,14 +1,80 @@
 // Dynamic API URL configuration
 const API_URL = (() => {
-  // If in production (Vercel), use environment variable or default to production API
+  // Use relative path for same-domain API (Vercel) or environment variable
   if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return window.API_URL || 'https://ats-backend.onrender.com/api';
+    return '/api'; // Use Vercel API routes
   }
-  // Development: use localhost
+  // Development: use localhost backend
   return 'http://localhost:5000/api';
 })();
 
 console.log('🔗 API URL:', API_URL);
+
+// File text extraction function
+async function extractFileText(file) {
+  if (file.type === 'application/pdf') {
+    return extractPdfText(file);
+  } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+    return extractDocxText(file);
+  } else {
+    throw new Error('Unsupported file format');
+  }
+}
+
+async function extractPdfText(file) {
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+  document.head.appendChild(script);
+
+  return new Promise((resolve, reject) => {
+    script.onload = async () => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const pdf = await pdfjsLib.getDocument(new Uint8Array(e.target.result)).promise;
+          let fullText = '';
+
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += pageText + '\n';
+          }
+
+          resolve(fullText);
+        } catch (error) {
+          reject(new Error('Failed to extract PDF text: ' + error.message));
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    };
+    script.onerror = () => reject(new Error('Failed to load PDF.js'));
+  });
+}
+
+async function extractDocxText(file) {
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.min.js';
+  document.head.appendChild(script);
+
+  return new Promise((resolve, reject) => {
+    script.onload = () => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const result = await mammoth.extractRawText({ arrayBuffer: e.target.result });
+          resolve(result.value);
+        } catch (error) {
+          reject(new Error('Failed to extract DOCX text: ' + error.message));
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    };
+    script.onerror = () => reject(new Error('Failed to load Mammoth.js'));
+  });
+}
 
 let currentAnalysis = null;
 
@@ -104,12 +170,25 @@ async function analyzeCV() {
   showLoading();
 
   try {
-    const formData = new FormData();
-    formData.append('cv', file);
+    // Extract text from file
+    console.log('📄 Extracting text from file...');
+    const cvText = await extractFileText(file);
 
+    if (!cvText || cvText.trim().length === 0) {
+      throw new Error('Could not extract text from file');
+    }
+
+    console.log('✅ Text extracted, sending to API...');
+
+    // Send to API for analysis
     const response = await fetch(`${API_URL}/analyze`, {
       method: 'POST',
-      body: formData
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        cvText: cvText
+      })
     });
 
     if (!response.ok) {
@@ -121,6 +200,7 @@ async function analyzeCV() {
     currentAnalysis = result.analysis;
     displayResults(result.analysis);
   } catch (error) {
+    console.error('Error:', error);
     showError(error.message || 'Failed to analyze CV. Please try again.');
     hideLoading();
   }

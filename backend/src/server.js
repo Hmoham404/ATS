@@ -16,9 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000'
-}));
+app.use(cors()); // Allow all origins (temporary for testing)
 app.use(express.json());
 
 // File upload configuration
