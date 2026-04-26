@@ -1,0 +1,15 @@
+node_modules
+.git
+.gitignore
+README.md
+SETUP.md
+DEPLOYMENT.md
+VERCEL_DEPLOYMENT.md
+VERCEL_404_FIX.md
+VERCEL_COMPLETE_GUIDE.md
+FIX_404_ERROR.md
+FIX_404_EASY.md
+SECURITY_FIX.md
+backend
+.env.local
+.env
